@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BiteRush — Fine Dining Delivered</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- CURSOR GLOW -->
+  <div class="cursor-glow" id="cursor-glow"></div>
+  <!-- GRAIN OVERLAY -->
+  <div class="grain"></div>
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-msg">Added to cart</span>
+  </div>
+
+  <!-- FLOATING COUPLES PANEL (right side) -->
+  <div class="couples-float-panel" id="couples-float-panel">
+    <button class="couples-float-close" onclick="toggleCouplesPanel(false)">×</button>
+    <div class="cfp-heart-anim">
+      <span class="cfp-heart h1">♥</span>
+      <span class="cfp-heart h2">♥</span>
+      <span class="cfp-heart h3">♥</span>
+    </div>
+    <div class="cfp-title">Date Night<br/><em>Special</em></div>
+    <div class="cfp-desc">20% OFF on any Couples Pack. Use code at checkout.</div>
+    <div class="cfp-code" onclick="applyCouplesCoupon()">
+      <i class="fa-solid fa-tag"></i> LOVE20
+    </div>
+    <div class="cfp-packs" id="cfp-packs"></div>
+    <button class="btn-gold cfp-cta" onclick="scrollToCouples()">View All Packs</button>
+  </div>
+  <!-- Couples tab trigger -->
+  <button class="couples-float-tab" id="couples-float-tab" onclick="toggleCouplesPanel(true)">
+    <i class="fa-solid fa-heart"></i>
+    <span>Couples</span>
+  </button>
+
+  <!-- BIRTHDAY MODAL -->
+  <div class="modal-overlay" id="bday-modal" style="display:none">
+    <div class="modal-box bday-box">
+      <div class="bday-emoji">🎂</div>
+      <h3>Happy Birthday!</h3>
+      <p>Today is your special day! Enjoy an exclusive <strong>15% birthday discount</strong> on your entire order.</p>
+      <div class="bday-code">Code: <strong>BDAY15</strong></div>
+      <div class="modal-actions">
+        <button class="btn-gold" onclick="applyBirthdayOffer()">Apply Discount</button>
+        <button class="btn-ghost" onclick="closeModal('bday-modal')">Maybe Later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD DETAILS MODAL -->
+  <div class="modal-overlay" id="card-modal" style="display:none">
+    <div class="modal-box">
+      <h3><i class="fa-solid fa-credit-card"></i> Card Details</h3>
+      <div class="form-group">
+        <label>Cardholder Name</label>
+        <input type="text" id="card-name" placeholder="Alexandra Reed"/>
+      </div>
+      <div class="form-group">
+        <label>Card Number</label>
+        <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)"/>
+      </div>
+      <div class="form-row-two">
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="text" id="card-expiry" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)"/>
+        </div>
+        <div class="form-group">
+          <label>CVV</label>
+          <input type="password" id="card-cvv" placeholder="•••" maxlength="3"/>
+        </div>
+      </div>
+      <div class="card-chips">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png" alt="MC" height="24"/>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png" alt="Visa" height="18"/>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/200px-American_Express_logo_%282018%29.svg.png" alt="Amex" height="24"/>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-gold" onclick="saveCardDetails()">Save & Continue</button>
+        <button class="btn-ghost" onclick="closeModal('card-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLET MODAL -->
+  <div class="modal-overlay" id="wallet-modal" style="display:none">
+    <div class="modal-box">
+      <h3><i class="fa-solid fa-mobile-screen"></i> Select Wallet</h3>
+      <div class="wallet-balance-card">
+        <div class="wallet-bal-label">Available Balance</div>
+        <div class="wallet-bal-amount">₹2,450.00</div>
+        <div class="wallet-bal-sub">BiteRush Wallet</div>
+      </div>
+      <div class="wallet-options">
+        <button class="wallet-opt" onclick="selectWallet('BiteRush Wallet', 2450)">
+          <span class="wallet-icon">🔥</span>
+          <span class="wallet-info"><strong>BiteRush Wallet</strong><small>Balance: ₹2,450.00</small></span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <button class="wallet-opt" onclick="selectWallet('PhonePe', 5800)">
+          <span class="wallet-icon">📱</span>
+          <span class="wallet-info"><strong>PhonePe</strong><small>Balance: ₹5,800.00</small></span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <button class="wallet-opt" onclick="selectWallet('Paytm', 1200)">
+          <span class="wallet-icon">💙</span>
+          <span class="wallet-info"><strong>Paytm</strong><small>Balance: ₹1,200.00</small></span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <button class="wallet-opt" onclick="selectWallet('Google Pay', 9999)">
+          <span class="wallet-icon">🔵</span>
+          <span class="wallet-info"><strong>Google Pay</strong><small>Linked to your UPI</small></span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+      <button class="btn-ghost" onclick="closeModal('wallet-modal')" style="width:100%;margin-top:12px;justify-content:center;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a class="logo" href="#" onclick="showPage('home');return false;">
+        <span class="logo-mark">✦</span><span>BiteRush</span>
+      </a>
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search-input" placeholder="Search restaurants, dishes, cuisines…" oninput="handleSearch()"/>
+        <!-- SEARCH DROPDOWN -->
+        <div class="search-dropdown hidden" id="search-dropdown"></div>
+      </div>
+      <div class="nav-links">
+        <button class="nav-link" onclick="showPage('home')">Home</button>
+        <button class="nav-link nav-couples" onclick="toggleCouplesPanel(true)">
+          <i class="fa-solid fa-heart"></i> Couples
+        </button>
+        <button class="cart-trigger" onclick="showPage('cart')">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== HOME ===================== -->
+  <div id="page-home" class="page active">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-bg">
+        <div class="hero-orb orb1"></div>
+        <div class="hero-orb orb2"></div>
+        <div class="hero-orb orb3"></div>
+        <div class="hero-grid-lines"></div>
+      </div>
+      <div class="hero-inner container">
+        <div class="hero-left">
+          <div class="hero-eyebrow">
+            <span class="pulse-dot"></span> Fine Dining · Delivered to Your Door
+          </div>
+          <h1 class="hero-title">
+            Indulge in<br/>
+            <em>Exceptional</em><br/>
+            Cuisine
+          </h1>
+          <p class="hero-desc">
+            Curated restaurants, handpicked menus, and seamless delivery —
+            crafted for those who refuse to compromise on taste.
+          </p>
+          <div class="hero-ctas">
+            <button class="btn-gold" onclick="document.getElementById('restaurants').scrollIntoView({behavior:'smooth'})">
+              Explore Menus <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="btn-ghost" onclick="toggleCouplesPanel(true)">
+              <i class="fa-solid fa-heart"></i> Couples Offer
+            </button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><span class="stat-num">500<sup>+</sup></span><span class="stat-lbl">Restaurants</span></div>
+            <div class="stat-div"></div>
+            <div class="stat"><span class="stat-num">4.9<sup>★</sup></span><span class="stat-lbl">Avg Rating</span></div>
+            <div class="stat-div"></div>
+            <div class="stat"><span class="stat-num">18<sup>min</sup></span><span class="stat-lbl">Delivery</span></div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-card-stack">
+            <div class="hero-food-card c1">
+              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&q=85" alt="Fine dining"/>
+              <div class="hcard-label">Fine Dining</div>
+            </div>
+            <div class="hero-food-card c2">
+              <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?w=500&q=85" alt="Couples dinner"/>
+              <div class="hcard-label">💑 Couples Night</div>
+            </div>
+            <div class="hero-food-card c3">
+              <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&q=85" alt="Gourmet pizza"/>
+              <div class="hcard-label">Gourmet Pizza</div>
+            </div>
+            <div class="hero-float-badge">
+              <i class="fa-solid fa-star"></i> 30-min Guarantee
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BIRTHDAY BANNER (shows if birthday matches) -->
+    <div class="bday-banner hidden" id="bday-banner">
+      <span>🎂 Happy Birthday! Use code <strong>BDAY15</strong> for 15% off today!</span>
+      <button onclick="applyBirthdayOffer()">Apply Now</button>
+      <button class="bday-close" onclick="this.parentElement.classList.add('hidden')">×</button>
+    </div>
+
+    <!-- ===== COUPLES SECTION ===== -->
+    <section class="couples-section" id="couples-section">
+      <div class="container">
+        <div class="section-label"><span class="eyebrow-dot rose"></span> Exclusive Offer</div>
+        <h2 class="section-title">Date Night,<em> Delivered</em> <i class="fa-solid fa-heart title-heart"></i></h2>
+        <p class="section-sub">Romantic meals for two — curated with love, at unbeatable value.</p>
+        <div class="couples-banner">
+          <div class="couples-banner-content">
+            <div class="couples-tag-pill">🔥 Limited Time</div>
+            <h3>Couples Night Package</h3>
+            <p>Get <strong>20% OFF</strong> when you order any 2 mains + 2 desserts + 2 drinks from participating restaurants.</p>
+            <div class="savings-badge">Save up to <strong>₹1,500</strong> per order</div>
+            <button class="btn-gold" onclick="applyCouplesCoupon()">
+              <i class="fa-solid fa-tag"></i> Apply Code: LOVE20
+            </button>
+          </div>
+          <div class="couples-banner-img">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=85" alt="Romantic dinner"/>
+            <div class="banner-shimmer"></div>
+          </div>
+        </div>
+        <div class="packs-header">
+          <h3>Choose Your Pack</h3>
+          <p>Thoughtfully assembled for unforgettable evenings</p>
+        </div>
+        <div class="couples-packs-grid" id="couples-packs-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===== CATEGORIES ===== -->
+    <section class="categories-section" id="restaurants">
+      <div class="container">
+        <div class="section-label"><span class="eyebrow-dot"></span> Browse by Mood</div>
+        <h2 class="section-title">What Are You<em> Craving?</em></h2>
+        <div class="category-pills" id="category-pills">
+          <button class="pill active" data-cat="All" onclick="filterByCategory('All',this)">All</button>
+          <button class="pill" data-cat="Indian" onclick="filterByCategory('Indian',this)">🍛 Indian</button>
+          <button class="pill" data-cat="Veg" onclick="filterByCategory('Veg',this)">🥦 Vegetarian</button>
+          <button class="pill" data-cat="Non-Veg" onclick="filterByCategory('Non-Veg',this)">🍗 Non-Veg</button>
+          <button class="pill" data-cat="Fast Food" onclick="filterByCategory('Fast Food',this)">🍔 Fast Food</button>
+          <button class="pill" data-cat="Pizza" onclick="filterByCategory('Pizza',this)">🍕 Pizza</button>
+          <button class="pill" data-cat="Chinese" onclick="filterByCategory('Chinese',this)">🍜 Chinese</button>
+          <button class="pill" data-cat="Sushi" onclick="filterByCategory('Sushi',this)">🍣 Sushi</button>
+          <button class="pill" data-cat="Desserts" onclick="filterByCategory('Desserts',this)">🍨 Desserts</button>
+          <button class="pill" data-cat="South Indian" onclick="filterByCategory('South Indian',this)">🥞 South Indian</button>
+          <button class="pill" data-cat="Street Food" onclick="filterByCategory('Street Food',this)">🌮 Street Food</button>
+          <button class="pill" data-cat="Mughlai" onclick="filterByCategory('Mughlai',this)">🍖 Mughlai</button>
+          <button class="pill couples-pill" data-cat="Couples" onclick="filterByCategory('Couples',this)">💑 Couples</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="restaurant-section">
+      <div class="container">
+        <div class="restaurant-grid" id="restaurant-grid"></div>
+        <p class="no-results hidden" id="no-results">No restaurants match your search.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-inner container">
+        <div class="logo footer-logo"><span class="logo-mark">✦</span> BiteRush</div>
+        <p>© 2025 BiteRush · Fine dining, delivered with love.</p>
+        <div class="footer-links"><span>Privacy</span><span>Terms</span><span>Contact</span></div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ===================== MENU PAGE ===================== -->
+  <div id="page-menu" class="page">
+    <div class="menu-topbar">
+      <button class="back-btn" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+      <div id="menu-restaurant-info" class="menu-rest-info"></div>
+      <button class="cart-trigger" onclick="showPage('cart')">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span class="cart-badge" id="cart-badge2">0</span>
+      </button>
+    </div>
+    <div class="container">
+      <div class="menu-grid" id="menu-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===================== CART PAGE ===================== -->
+  <div id="page-cart" class="page">
+    <div class="container">
+      <div class="page-hdr">
+        <button class="back-btn" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i> Continue</button>
+        <h2>Your Cart <span class="muted-lbl" id="cart-count-label"></span></h2>
+      </div>
+      <div class="cart-layout">
+        <div id="cart-items-wrap" class="cart-items-wrap"></div>
+        <div id="cart-summary" class="cart-summary-card"></div>
+      </div>
+      <div class="cart-empty hidden" id="cart-empty">
+        <div class="empty-ico">🛒</div>
+        <h3>Your cart is empty</h3>
+        <p>Discover something extraordinary</p>
+        <button class="btn-gold" onclick="showPage('home')">Browse Restaurants</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CHECKOUT PAGE ===================== -->
+  <div id="page-checkout" class="page">
+    <div class="container">
+      <div class="page-hdr">
+        <button class="back-btn" onclick="showPage('cart')"><i class="fa-solid fa-arrow-left"></i> Cart</button>
+        <h2>Checkout</h2>
+      </div>
+      <div class="checkout-layout">
+        <div class="checkout-form-card">
+          <h3>Delivery Details</h3>
+          <div class="form-row-two">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="co-name" placeholder="Aryan Sharma"/>
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="co-phone" placeholder="+91 98765 43210"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Delivery Address</label>
+            <textarea id="co-address" rows="3" placeholder="Flat 4B, Prestige Tower, MG Road, Bengaluru 560001…"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Special Instructions</label>
+            <input type="text" id="co-note" placeholder="Allergies, preferences, floor number…"/>
+          </div>
+
+          <!-- BIRTHDAY CHECK -->
+          <div class="bday-check-row">
+            <label class="bday-check-label">
+              <i class="fa-solid fa-cake-candles"></i> Is today your birthday?
+            </label>
+            <div class="bday-inputs">
+              <input type="date" id="bday-input" onchange="checkBirthday(this.value)"/>
+              <span class="bday-hint">Get 15% off as our birthday gift!</span>
+            </div>
+            <div class="bday-applied hidden" id="bday-applied">
+              🎂 Birthday discount <strong>BDAY15</strong> applied!
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method</label>
+            <div class="pay-options">
+              <label class="pay-card" onclick="onPayChange('card')"><input type="radio" name="pay" value="card" checked/><i class="fa-solid fa-credit-card"></i> Card</label>
+              <label class="pay-card" onclick="onPayChange('cash')"><input type="radio" name="pay" value="cash"/><i class="fa-solid fa-money-bill"></i> Cash</label>
+              <label class="pay-card" onclick="onPayChange('wallet')"><input type="radio" name="pay" value="wallet"/><i class="fa-solid fa-mobile-screen"></i> Wallet</label>
+              <label class="pay-card" onclick="onPayChange('upi')"><input type="radio" name="pay" value="upi"/><i class="fa-solid fa-qrcode"></i> UPI</label>
+            </div>
+          </div>
+
+          <!-- UPI Field -->
+          <div class="upi-row hidden" id="upi-row">
+            <div class="form-group">
+              <label>UPI ID</label>
+              <input type="text" id="upi-id" placeholder="yourname@upi"/>
+            </div>
+          </div>
+
+          <div class="coupon-applied-row hidden" id="coupon-row">
+            <i class="fa-solid fa-tag"></i> <strong id="coupon-label">LOVE20</strong> applied!
+          </div>
+          <button class="btn-gold full" onclick="placeOrder()">
+            Place Order <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+        <div class="checkout-summary-card" id="checkout-summary"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CONFIRM PAGE ===================== -->
+  <div id="page-confirm" class="page">
+    <div class="confirm-scene">
+      <div class="confetti-wrap" id="confetti-wrap"></div>
+      <div class="confirm-card">
+        <div class="confirm-mark">✦</div>
+        <h2>Order Confirmed!</h2>
+        <p class="confirm-sub">Your culinary experience is being prepared with care</p>
+        <div class="order-pill">Order <strong id="order-id-display"></strong></div>
+        <div class="eta-row"><i class="fa-regular fa-clock"></i> Estimated delivery: <strong id="eta-time">35–45 minutes</strong></div>
+
+        <!-- LIVE TRACKING -->
+        <div class="tracking-wrap">
+          <div class="track-steps">
+            <div class="tstep active" id="ts1">
+              <div class="tstep-dot"><i class="fa-solid fa-check"></i></div>
+              <span>Confirmed</span>
+            </div>
+            <div class="tstep-line" id="tl1"></div>
+            <div class="tstep" id="ts2">
+              <div class="tstep-dot"><i class="fa-solid fa-fire-burner"></i></div>
+              <span>Preparing</span>
+            </div>
+            <div class="tstep-line" id="tl2"></div>
+            <div class="tstep" id="ts3">
+              <div class="tstep-dot"><i class="fa-solid fa-motorcycle"></i></div>
+              <span>On the Way</span>
+            </div>
+            <div class="tstep-line" id="tl3"></div>
+            <div class="tstep" id="ts4">
+              <div class="tstep-dot"><i class="fa-solid fa-house"></i></div>
+              <span>Delivered</span>
+            </div>
+          </div>
+          <div class="track-status-msg" id="track-status-msg">
+            ✅ Order placed successfully! Restaurant is being notified…
+          </div>
+          <div class="track-timer-bar">
+            <div class="track-timer-fill" id="track-timer-fill"></div>
+          </div>
+          <div class="track-eta-detail" id="track-eta-detail">
+            Estimated delivery by <strong id="track-eta-clock"></strong>
+          </div>
+        </div>
+
+        <button class="btn-gold" onclick="resetAndGoHome()">Order Again ✦</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
