@@ -28,7 +28,7 @@ const COUPLES_PACKS = [
   {
     id: "cp4", name: "Sushi for Two", for: "Japanese Night · For 2",
     badge: "🍣 New", badgeClass: "", featured: false,
-    image: "/images.sushi.jpg",
+    image: "images.sushi.jpg",
     items: ["2 × Premium Sushi Platters (10 pcs each)","1 × Miso Soup each","2 × Dragon Rolls","2 × Green Tea / Sake"],
     originalPrice: 8960, discountedPrice: 7168, discount: "20% OFF",
   },
